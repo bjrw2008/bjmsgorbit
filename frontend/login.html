@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - BJMS Orbit Bot</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="auth-container">
+        <div class="auth-card">
+            <h2>Login to BJMS Orbit</h2>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Login</button>
+            </form>
+            <p class="auth-switch">Don't have an account? <a href="#" onclick="showRegister()">Register</a></p>
+        </div>
+        
+        <div class="auth-card" id="registerCard" style="display: none;">
+            <h2>Register</h2>
+            <form id="registerForm">
+                <div class="form-group">
+                    <label for="regUsername">Username</label>
+                    <input type="text" id="regUsername" required>
+                </div>
+                <div class="form-group">
+                    <label for="regPassword">Password</label>
+                    <input type="password" id="regPassword" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Register</button>
+            </form>
+            <p class="auth-switch">Already have an account? <a href="#" onclick="showLogin()">Login</a></p>
+        </div>
+    </div>
+    
+    <script>
+        const API_URL = window.location.origin;
+        
+        function showRegister() {
+            document.querySelector('.auth-card:first-child').style.display = 'none';
+            document.getElementById('registerCard').style.display = 'block';
+        }
+        
+        function showLogin() {
+            document.getElementById('registerCard').style.display = 'none';
+            document.querySelector('.auth-card:first-child').style.display = 'block';
+        }
+        
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            
+            try {
+                const response = await fetch(`${API_URL}/api/auth/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password })
+                });
+                
+                const data = await response.json();
+                if (response.ok) {
+                    localStorage.setItem('token', data.token);
+                    localStorage.setItem('username', data.username);
+                    window.location.href = '/dashboard';
+                } else {
+                    alert(data.error || 'Login failed');
+                }
+            } catch (error) {
+                alert('Login failed: ' + error.message);
+            }
+        });
+        
+        document.getElementById('registerForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const username = document.getElementById('regUsername').value;
+            const password = document.getElementById('regPassword').value;
+            
+            try {
+                const response = await fetch(`${API_URL}/api/auth/register`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password })
+                });
+                
+                const data = await response.json();
+                if (response.ok) {
+                    localStorage.setItem('token', data.token);
+                    localStorage.setItem('username', data.username);
+                    window.location.href = '/dashboard';
+                } else {
+                    alert(data.error || 'Registration failed');
+                }
+            } catch (error) {
+                alert('Registration failed: ' + error.message);
+            }
+        });
+    </script>
+</body>
+</html>

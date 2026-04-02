@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>BJMS Orbit Bot - Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+   
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #0a0e27;
+            color: #e0e0e0;
+            overflow-x: hidden;
+        }
+
+        /* Dashboard Container */
+        .dashboard-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 280px;
+            background: linear-gradient(180deg, #0f1535 0%, #0a0e27 100%);
+            border-right: 1px solid #1a1f3e;
+            position: fixed;
+            height: 100vh;
+            left: 0;
+            top: 0;
+            transition: all 0.3s ease;
+            z-index: 1000;
+            overflow-y: auto;
+        }
+
+        .sidebar-header {
+            padding: 25px 20px;
+            border-bottom: 1px solid #1a1f3e;
+            text-align: center;
+        }
+
+        .sidebar-header h2 {
+            color: #667eea;
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+
+        .sidebar-header p {
+            color: #8892b0;
+            font-size: 12px;
+        }
+
+        .sidebar-menu {
+            padding: 20px 0;
+        }
+
+        .menu-item {
+            padding: 12px 25px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: #8892b0;
+            cursor: pointer;
+            transition: all 0.3s;
+            border-left: 3px solid transparent;
+        }
+
+        .menu-item:hover, .menu-item.active {
+            background: rgba(102, 126, 234, 0.1);
+            color: #667eea;
+            border-left-color: #667eea;
+        }
+
+        .menu-item i {
+            width: 20px;
+            font-size: 18px;
+        }
+
+        .menu-item span {
+            font-size: 14px;
+        }
+
+        .sidebar-footer {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 20px;
+            border-top: 1px solid #1a1f3e;
+            text-align: center;
+            font-size: 12px;
+            color: #8892b0;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            margin-left: 280px;
+            padding: 20px;
+            transition: all 0.3s ease;
+        }
+
+        /* Top Bar */
+        .top-bar {
+            background: #0f1535;
+            border-radius: 10px;
+            padding: 15px 25px;
+            margin-bottom: 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            color: #667eea;
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .user-info span {
+            color: #e0e0e0;
+        }
+
+        .btn-logout {
+            background: rgba(245, 101, 101, 0.2);
+            color: #f56565;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-logout:hover {
+            background: rgba(245, 101, 101, 0.4);
+        }
+
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: #0f1535;
+            border-radius: 10px;
+            padding: 20px;
+            border: 1px solid #1a1f3e;
+        }
+
+        .stat-card h3 {
+            color: #8892b0;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+
+        .stat-card .number {
+            font-size: 32px;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        /* Button */
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: transform 0.2s;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: rgba(72, 187, 120, 0.2);
+            color: #48bb78;
+            border: 1px solid #48bb78;
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .btn-danger {
+            background: rgba(245, 101, 101, 0.2);
+            color: #f56565;
+            border: 1px solid #f56565;
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        /* Schedules List */
+        .schedules-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .schedule-card {
+            background: #0f1535;
+            border-radius: 10px;
+            padding: 20px;
+            border: 1px solid #1a1f3e;
+            transition: all 0.3s;
+        }
+
+        .schedule-card:hover {
+            transform: translateX(5px);
+            border-color: #667eea;
+        }
+
+        .schedule-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .schedule-name {
+            font-size: 18px;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .schedule-status {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .status-active {
+            background: rgba(72, 187, 120, 0.2);
+            color: #48bb78;
+        }
+
+        .status-inactive {
+            background: rgba(245, 101, 101, 0.2);
+            color: #f56565;
+        }
+
+        .schedule-details {
+            color: #8892b0;
+            font-size: 13px;
+            margin-bottom: 15px;
+            line-height: 1.6;
+        }
+
+        .schedule-details i {
+            width: 20px;
+            margin-right: 8px;
+        }
+
+        .schedule-message {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 12px;
+            border-radius: 8px;
+            margin: 15px 0;
+            font-size: 13px;
+            border-left: 3px solid #667eea;
+        }
+
+        .schedule-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        /* Modal */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            background: #0f1535;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 85vh;
+            overflow-y: auto;
+            position: relative;
+            border: 1px solid #1a1f3e;
+        }
+
+        .modal-header {
+            padding: 20px;
+            border-bottom: 1px solid #1a1f3e;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h3 {
+            color: #667eea;
+        }
+
+        .close {
+            font-size: 28px;
+            cursor: pointer;
+            color: #8892b0;
+            transition: color 0.3s;
+        }
+
+        .close:hover {
+            color: #f56565;
+        }
+
+        .modal-body {
+            padding: 20px;
+        }
+
+        /* Form */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #e0e0e0;
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px 12px;
+            background: #1a1f3e;
+            border: 1px solid #2d3354;
+            border-radius: 8px;
+            color: #e0e0e0;
+            font-size: 14px;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .form-group small {
+            display: block;
+            margin-top: 5px;
+            color: #8892b0;
+            font-size: 11px;
+        }
+
+        /* No Schedules */
+        .no-schedules {
+            text-align: center;
+            padding: 60px 20px;
+            color: #8892b0;
+            background: #0f1535;
+            border-radius: 10px;
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            
+            .sidebar.mobile-open {
+                transform: translateX(0);
+            }
+            
+            .main-content {
+                margin-left: 0;
+            }
+            
+            .menu-toggle {
+                display: block;
+            }
+            
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .top-bar {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #0a0e27;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #2d3354;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #667eea;
+        }
+
+        .footer-text {
+            text-align: center;
+            padding: 20px;
+            color: #667eea;
+            font-size: 12px;
+            border-top: 1px solid #1a1f3e;
+            margin-top: 30px;
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <div class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <h2><i class="fas fa-paper-plane"></i> BJMS Orbit</h2>
+                <p>Telegram Bot Scheduler</p>
+            </div>
+            <div class="sidebar-menu">
+                <div class="menu-item active" onclick="showTab('schedules')">
+                    <i class="fas fa-calendar-alt"></i>
+                    <span>All Schedules</span>
+                </div>
+                <div class="menu-item" onclick="showCreateForm()">
+                    <i class="fas fa-plus-circle"></i>
+                    <span>New Schedule</span>
+                </div>
+                <div class="menu-item" onclick="showTab('stats')">
+                    <i class="fas fa-chart-line"></i>
+                    <span>Statistics</span>
+                </div>
+                <div class="menu-item" onclick="showTab('help')">
+                    <i class="fas fa-question-circle"></i>
+                    <span>Help & Guide</span>
+                </div>
+            </div>
+            <div class="sidebar-footer">
+                <i class="fas fa-code"></i> Developed by BJ MS
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <div class="top-bar">
+                <button class="menu-toggle" onclick="toggleSidebar()">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <div class="user-info">
+                    <span><i class="fas fa-user"></i> <span id="username"></span></span>
+                    <button onclick="logout()" class="btn-logout">
+                        <i class="fas fa-sign-out-alt"></i> Logout
+                    </button>
+                </div>
+            </div>
+
+            <!-- Stats Section -->
+            <div id="statsSection">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <h3><i class="fas fa-tasks"></i> Total Schedules</h3>
+                        <div class="number" id="totalCount">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <h3><i class="fas fa-play-circle"></i> Active Schedules</h3>
+                        <div class="number" id="activeCount">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <h3><i class="fas fa-check-circle"></i> Completed</h3>
+                        <div class="number" id="completedCount">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <h3><i class="fas fa-clock"></i> Total Sent</h3>
+                        <div class="number" id="totalSent">0</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Schedules List -->
+            <div id="schedulesList" class="schedules-list"></div>
+
+            <!-- Help Section -->
+            <div id="helpSection" style="display: none;">
+                <div class="stat-card" style="padding: 30px;">
+                    <h3><i class="fas fa-info-circle"></i> How to Use</h3>
+                    <div style="margin-top: 20px; line-height: 1.8;">
+                        <p><strong>1. Add Bot to Channel:</strong> Add @your_bot as admin to your Telegram channel</p>
+                        <p><strong>2. Get Channel ID:</strong> Forward message from channel to @userinfobot</p>
+                        <p><strong>3. Create Schedule:</strong> Click "New Schedule" and fill details</p>
+                        <p><strong>4. Message Types:</strong> Text, Photos, Videos, Polls with buttons</p>
+                        <p><strong>5. Intervals:</strong> Every minute, 2 hours, daily, weekly, or custom hours</p>
+                        <p><strong>6. Buttons:</strong> Add interactive buttons using JSON format</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="footer-text">
+                <i class="fas fa-heart"></i> Developed with love by BJ MS | Telegram Bot Scheduler
+            </div>
+        </div>
+    </div>
+
+    <!-- Schedule Modal -->
+    <div id="scheduleModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalTitle">Create New Schedule</h3>
+                <span class="close" onclick="closeModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="scheduleForm">
+                    <div class="form-group">
+                        <label><i class="fas fa-tag"></i> Schedule Name</label>
+                        <input type="text" id="scheduleName" required placeholder="e.g., Morning News">
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fab fa-telegram"></i> Channel ID</label>
+                        <input type="text" id="channelId" required placeholder="@channel or -1001234567890">
+                        <small>Make sure bot is admin in this channel</small>
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-hashtag"></i> Channel Name (Optional)</label>
+                        <input type="text" id="channelName" placeholder="My Channel">
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-envelope"></i> Message</label>
+                        <textarea id="message" required placeholder="Your message here... Supports HTML tags: &lt;b&gt;, &lt;i&gt;, &lt;a&gt;"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-image"></i> Message Type</label>
+                        <select id="messageType" onchange="toggleMessageType()">
+                            <option value="text">Text Message</option>
+                            <option value="photo">Photo</option>
+                            <option value="video">Video</option>
+                            <option value="poll">Poll</option>
+                        </select>
+                    </div>
+                    <div id="mediaGroup" style="display: none;">
+                        <div class="form-group">
+                            <label>Media URL</label>
+                            <input type="text" id="mediaUrl" placeholder="https://example.com/image.jpg">
+                        </div>
+                        <div class="form-group">
+                            <label>Caption</label>
+                            <textarea id="caption" rows="2" placeholder="Caption for media"></textarea>
+                        </div>
+                    </div>
+                    <div id="pollGroup" style="display: none;">
+                        <div class="form-group">
+                            <label>Poll Question</label>
+                            <input type="text" id="pollQuestion">
+                        </div>
+                        <div class="form-group">
+                            <label>Poll Options (comma separated)</label>
+                            <input type="text" id="pollOptions" placeholder="Option 1, Option 2, Option 3">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-clock"></i> Interval</label>
+                        <select id="interval" onchange="toggleIntervalOptions()">
+                            <option value="every_minute">Every Minute</option>
+                            <option value="every_2_hours">Every 2 Hours</option>
+                            <option value="daily">Daily</option>
+                            <option value="weekly">Weekly</option>
+                            <option value="custom">Custom (Min)</option>
+                        </select>
+                    </div>
+                    <div id="customIntervalGroup" class="form-group" style="display: none;">
+                        <label>Custom Interval (minutes)</label>
+                        <input type="number" id="customInterval" min="1" max="720">
+                    </div>
+                    <div id="timeGroup" class="form-group" style="display: none;">
+                        <label>Time</label>
+                        <div style="display: flex; gap: 10px;">
+                            <input type="number" id="hour" placeholder="Hour (0-23)" min="0" max="23" style="width: 50%;">
+                            <input type="number" id="minute" placeholder="Minute (0-59)" min="0" max="59" style="width: 50%;">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-link"></i> Buttons (JSON format)</label>
+                        <textarea id="buttons" rows="3" placeholder='[{"text":"Visit Website","type":"url","url":"https://example.com"},{"text":"Click Me","type":"inline","callbackData":"button1"}]'></textarea>
+                        <small>Add interactive buttons to your message</small>
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-calendar-times"></i> End Date (Optional)</label>
+                        <input type="datetime-local" id="endDate">
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-chart-simple"></i> Max Sends (Optional)</label>
+                        <input type="number" id="maxSends" min="1" max="10000" placeholder="Unlimited if empty">
+                    </div>
+                    <button type="submit" class="btn-primary" style="width: 100%;">
+                        <i class="fas fa-save"></i> Save Schedule
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
