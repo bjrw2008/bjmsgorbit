@@ -43,21 +43,6 @@ mongoose.connect(process.env.MONGODB_URI, {
 .then(() => console.log('Connected to MongoDB Atlas'))
 .catch(err => console.error('MongoDB connection error:', err));
 
-// Create default admin if not exists
-const createDefaultAdmin = async () => {
-  try {
-    const adminExists = await User.findOne({ username: 'admin' });
-    if (!adminExists) {
-      const admin = new User({ username: 'admin', password: 'admin123' });
-      await admin.save();
-      console.log('Default admin created: username=admin, password=admin123');
-    }
-  } catch (error) {
-    console.error('Error creating default admin:', error);
-  }
-};
-createDefaultAdmin();
-
 // Routes
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/schedules', require('./routes/schedules'));
