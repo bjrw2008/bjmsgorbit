@@ -256,16 +256,21 @@ bot.onText(/\/status/, async (msg) => {
 
 // Handle bot being added to channel
 bot.on('new_chat_members', async (msg) => {
-  const newMembers = msg.new_chat_members;
-  for (const member of newMembers) {
-    if (member.id === bot.botInfo.id) {
-      const channelId = msg.chat.id.toString();
-      const channelTitle = msg.chat.title || 'Unknown Channel';
-      console.log(`✅ Bot added to channel: ${channelTitle} (${channelId})`);
-      
-      // Send welcome message
-      bot.sendMessage(channelId, `🎉 *Thank you for adding me!*\n\nI'm now ready to send scheduled messages to this channel.\n\n📋 *Next steps:*\n1. Open the dashboard\n2. Create a new schedule\n3. Use this channel ID: \`${channelId}\`\n\n🔗 Dashboard: ${process.env.FRONTEND_URL}`, { parse_mode: 'Markdown' });
+  try {
+    const newMembers = msg.new_chat_members;
+    if (!newMembers || !bot.botInfo) return;
+    
+    for (const member of newMembers) {
+      if (member && member.id === bot.botInfo.id) {
+        const channelId = msg.chat.id.toString();
+        const channelTitle = msg.chat.title || 'Unknown Channel';
+        console.log(`✅ Bot added to channel: ${channelTitle} (${channelId})`);
+        
+        bot.sendMessage(channelId, `🎉 *Thank you for adding me!*\n\nI'm now ready to send scheduled messages to this channel.\n\n📋 *Next steps:*\n1. Open the dashboard\n2. Create a new schedule\n3. Use this channel ID: \`${channelId}\`\n\n🔗 Dashboard: ${process.env.FRONTEND_URL}`, { parse_mode: 'Markdown' }).catch(e => console.log('Welcome error:', e.message));
+      }
     }
+  } catch (error) {
+    console.error('Error:', error.message);
   }
 });
 
