@@ -59,14 +59,6 @@ app.get('/login', (req, res) => {
 app.get('/dashboard', (req, res) => {
   res.sendFile(path.join(__dirname, '../frontend/dashboard.html'));
 });
-// Health check endpoint
-app.get('/health', (req, res) => {
-  res.json({ 
-    status: 'active', 
-    timestamp: new Date().toISOString(),
-    uptime: process.uptime()
-  });
-});
 // Advanced message sending function with buttons
 async function sendAdvancedMessage(bot, schedule) {
   try {
